@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                       // Utilise une version moderne de JavaScript (tu peux ajuster selon tes besoins)
+    "module": "CommonJS",                      // Type de module utilisé par Node.js
+    "moduleResolution": "node",                // Pour utiliser la résolution des modules à la Node.js
+    "outDir": "./dist",                        // Dossier de sortie des fichiers compilés
+    "rootDir": "./src",                        // Répertoire source de ton code TypeScript
+    "strict": true,                            // Active toutes les vérifications strictes
+    "esModuleInterop": true,                   // Permet l'importation des modules CommonJS avec la syntaxe `import`
+    "skipLibCheck": true,                      // Ignore la vérification des types des fichiers de définition des bibliothèques
+    "forceConsistentCasingInFileNames": true,  // Assure la cohérence de la casse dans les noms de fichiers
+    "resolveJsonModule": true,                 // Permet d'importer des fichiers JSON
+    "allowJs": true,                           // Permet d'utiliser des fichiers JavaScript dans le projet
+    "noImplicitAny": true,                     // Empêche l'utilisation de `any` implicite
+    "noEmitOnError": true,                     // N'émet pas de fichiers si une erreur est présente
+    "lib": ["ES2020", "DOM"],                  // Définit les bibliothèques à inclure pour le projet
+    "declaration": true,                       // Génère des fichiers de déclaration `.d.ts` (utile pour la distribution)
+    "skipDefaultLibCheck": true                // Ignore les vérifications de la bibliothèque par défaut
+  },
+  "include": [
+    "src/**/*"                                 // Inclus tous les fichiers dans le répertoire `src`
+  ],
+  "exclude": [
+    "node_modules"                             // Exclut le répertoire `node_modules`
+  ]
+}
