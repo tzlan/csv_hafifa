@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Intercontinental Strike,Missile,350,2000,300,20000,NO,Central Air Base
+Doomsday Device II,Atomic,12000,80,12000,1500,NO,Underground Air Base
+Heavy Tank II,Ground Vehicle,90,80,0,1500,YES,All bases
+Fast Attack Vehicle II,Ground Vehicle,280,1,25,8000,YES,Central Air Base
+Energy Blade,Melee Weapon,0.8,2500,0.25,0,YES,All bases

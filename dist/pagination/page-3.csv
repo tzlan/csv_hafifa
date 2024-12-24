@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+The Hoover,Helicopter,123000,23,0,1200,YES,Underground Air Base
+The Ball,Zeppelin,65000,2,0,0,NO,North Bunker
+Little Girl,Bomb,5.5,530,23,5,YES,South Camp
+Adi Himembloy,Bomb,123,1,500,600,NO,Underground Air Base
+Amit Potsets,Bomb,0.1,65000,1,1,YES,"Central Air Base, Nothern Air Base"

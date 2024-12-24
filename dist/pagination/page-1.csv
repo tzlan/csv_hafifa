@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Golden Sword,Sword,1,2000,0.1,0,YES,All bases
+Diamond Magic Knife,Sword,100,15,100,1000,NO,Central Air Base
+Laser Pistol,Rifle,1.5,2500,1,0.2,YES,All bases
+Laser Rifle,Rifle,3.2,1500,2,0.6,YES,All bases
+Laser Shield,Protection,2.5,4000,0,0,YES,All bases

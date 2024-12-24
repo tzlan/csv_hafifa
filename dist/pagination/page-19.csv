@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Scout Wing,Drone,0.35,450,2.5,180,NO,South Camp
+Mega Blast,Bomb,15,350,250,10,YES,North Bunker
+Sky Cruiser,Aircraft,180000,15,0,12000,YES,Central Air Base
+Thunderbolt,Helicopter,90000,50,0,600,YES,"Central Air Base, Underground Air Base"
+Black Viper,Aircraft,350000,10,0,28000,NO,Underground Air Base

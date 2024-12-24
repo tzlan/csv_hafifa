@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Precision Bomb,Bomb,8,500,30,7,YES,South Camp
+EMP Blast,Bomb,300,1,1200,1000,NO,Underground Air Base
+Rapid Shot,Bomb,0.05,85000,0.5,0.5,YES,"Central Air Base, Northern Air Base"
+Guided Strike,Missile,50,3000,35,800,YES,"North Bunker, Underground Air Base"
+Interceptor Strike,AA missile,25,22000,0,45,YES,"Northern Air Base, Underground Air Base, Central Air Base"

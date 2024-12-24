@@ -1,0 +1,3 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Sky Cruiser,Aircraft,180000,15,0,12000,YES,Central Air Base
+Thunderbolt,Helicopter,90000,50,0,600,YES,"Central Air Base, Underground Air Base"

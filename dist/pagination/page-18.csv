@@ -1,0 +1,6 @@
+Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Bibicar,Ground Vehicle,120,2,10,5000,YES,Central Air Base
+Iron Claw,Melee Weapon,1.2,1500,0.3,0,YES,All bases
+Phantom Dagger,Sword,85,30,90,750,NO,North Bunker
+Pulse Cannon,Rifle,5.5,1000,3.5,1.2,YES,All bases
+Energy Barrier,Protection,3.8,3000,0,0,YES,All bases
