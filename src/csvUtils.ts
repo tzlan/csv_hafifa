@@ -28,9 +28,9 @@ ts-node src/index.ts --action "filter" --file "data.csv" --column "range" --cond
 */
 
 /**
- * Fonction pour lire un fichier CSV et le convertir en tableau d'objets.
- * @param filePath Chemin du fichier CSV.
- * @returns Données du CSV parsées sous forme de tableau d'objets.
+ * Fonction pour lire un fichier CSV et le convertir en tableau d'objets
+ * @param filePath Chemin du fichier CSV
+ * @returns Données du CSV parsées sous forme de tableau d'objets
  */
 export async function readCSV(filePath: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
