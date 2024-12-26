@@ -1,6 +1,0 @@
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
-Poison Arrow,Projectile,0.02,120000,0.02,0.02,YES,All bases
-Sonic Pulse,Rifle,8,600,5.5,2,YES,All bases
-Force Dome,Protection,5,1800,0,0,YES,All bases
-Recon Probe,Drone,0.5,250,4,150,NO,North Bunker
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location

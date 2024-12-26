@@ -8,139 +8,170 @@ exports.paginate = paginate;
 exports.savePagesAsCSV = savePagesAsCSV;
 exports.sortData = sortData;
 exports.filterData = filterData;
+exports.processCSV = processCSV;
 const fs_1 = __importDefault(require("fs"));
 const papaparse_1 = __importDefault(require("papaparse"));
+//ts-node index.ts --action "read-csv" --file "data.csv" --limit 5
+//ts-node index.ts --action "sort" --file "data.csv" --column "unit_cost" --order "asc" # ou "desc"
+//ts-node index.ts --action "sort" --file "data.csv" --column "type" --order "asc"
+//ts-node index.ts --action "filter" --file "data.csv" --column "type" --condition "equal" --value "bomb"
+//ts-node index.ts --action "filter" --file "data.csv" --column "range" --condition "greater" --value 500
 /**
- * Reads a CSV file and returns its content as an array of objects.
- * @param filePath Path to the CSV file.
- * @returns Parsed CSV data as an array of objects.
+ * Fonction pour lire un fichier CSV et le convertir en tableau d'objets.
+ * @param filePath Chemin du fichier CSV.
+ * @returns Données du CSV parsées sous forme de tableau d'objets.
  */
 async function readCSV(filePath) {
     return new Promise((resolve, reject) => {
-        const fileContent = fs_1.default.readFileSync(filePath, 'utf8'); // Lecture du fichier
+        // Lecture du fichier CSV en tant que texte
+        const fileContent = fs_1.default.readFileSync(filePath, 'utf8');
+        // Utilisation de PapaParse pour convertir le texte en JSON
         papaparse_1.default.parse(fileContent, {
-            header: true,
-            skipEmptyLines: true,
-            complete: (result) => resolve(result.data),
-            error: (error) => reject(error),
+            header: true, // Considérer la première ligne comme en-tête
+            skipEmptyLines: true, // Ignorer les lignes vides
+            complete: (result) => resolve(result.data), // Résultat en cas de succès
+            error: (error) => reject(error), // Gestion des erreurs
         });
     });
 }
 /**
- * Paginates data into smaller chunks of a specified size.
- * @param data Array of objects to paginate.
- * @param pageSize Number of items per page.
- * @returns Array of pages (each page is an array of objects).
+ * Fonction pour paginer un tableau en morceaux plus petits.
+ * @param data Tableau d'objets à paginer.
+ * @param pageSize Nombre d'éléments par page.
+ * @returns Un tableau contenant des pages (chacune étant un tableau d'objets).
  */
 function paginate(data, pageSize) {
-    // Vérification de la validité de pageSize
     if (!Number.isInteger(pageSize) || pageSize < 2 || pageSize > 50) {
         throw new Error('Page size must be an integer between 2 and 50.');
     }
-    // Calcul du nombre de pages, en utilisant Math.ceil pour garantir que toutes les lignes sont couvertes
+    // calcule du nombre total de pages
     const numberOfPages = Math.ceil(data.length / pageSize);
-    console.log(`Data paginated into ${numberOfPages} pages.`);
+    /**  je divise le nombre total d'éléments par le nombre d'éléments par page
+    * le résultat de la division vers le haut pour inclure une
+    * page supplémentaire si des lignes restent
+    *
+    * si le tableau contient 11 éléments et que la taille de la page est 5 genre 11/5 = 3
+    */
     const pages = [];
+    //je crée les pages 
     for (let i = 0; i < numberOfPages; i++) {
-        const start = i * pageSize; // Calcul de l'index de départ pour la page
-        const end = Math.min(start + pageSize, data.length); // On s'assure que l'on ne dépasse pas la longueur des données
-        pages.push(data.slice(start, end)); // Découpe les données de la page
+        const start = i * pageSize;
+        const end = Math.min(start + pageSize, data.length);
+        // Ajouter une tranche de données à la page
+        pages.push(data.slice(start, end));
     }
     return pages;
 }
 /**
- * Writes paginated data to separate CSV files.
- * @param pages Array of pages (each page is an array of objects).
- * @param outputDir Directory to save the files.
+ * fonction pour sauvegarder chaque page dans un fichier CSV séparé
+ * @param pages tableau de pages (chacune étant un tableau d'objets)
+ * @param outputDir dossier ou je sauvegarde mes fichiers
  */
 function savePagesAsCSV(pages, outputDir) {
     if (!fs_1.default.existsSync(outputDir)) {
-        fs_1.default.mkdirSync(outputDir); // Création du répertoire si nécessaire
+        fs_1.default.mkdirSync(outputDir); // Créer le dossier s'il n'existe pas
     }
     pages.forEach((page, index) => {
+        // Convertir une page en contenu CSV
         const csvContent = papaparse_1.default.unparse(page);
-        const fileName = `${outputDir}/page-${index + 1}.csv`;
-        fs_1.default.writeFileSync(fileName, csvContent);
+        const fileName = `${outputDir}/page-${index + 1}.cspv`; // Nom du fichier
+        fs_1.default.writeFileSync(fileName, csvContent); // Écrire le contenu dans le fichier
         console.log(`Page ${index + 1} saved to ${fileName}`);
     });
 }
 /**
- * Sorts the data by a specific column and order (ascending or descending) using Bubble Sort.
- * @param data Array of objects to sort.
- * @param columnIndex Index of the column to sort by (0-based).
- * @param order Sorting order ('asc' for ascending, 'desc' for descending).
- * @returns Sorted array of objects.
+ * Fonction de tri des données par colonne et ordre (ascendant ou descendant).
+ * @param data Tableau d'objets à trier.
+ * @param columnIndex Index de la colonne à trier.
+ * @param order Ordre du tri ('asc' ou 'desc').
+ * @returns Tableau trié.
  */
 function sortData(data, columnIndex, order) {
     const n = data.length;
-    console.log('Before sorting:', data);
-    // Implémentation du tri à bulles
     for (let i = 0; i < n - 1; i++) {
         let swapped = false;
         for (let j = 0; j < n - 1 - i; j++) {
-            const valueA = data[j][columnIndex];
-            const valueB = data[j + 1][columnIndex];
+            let valueA = data[j][columnIndex];
+            let valueB = data[j + 1][columnIndex];
             let shouldSwap = false;
-            // Comparaison en fonction de l'ordre et des types
-            if (typeof valueA === 'string' && typeof valueB === 'string') {
-                shouldSwap = order === 'asc' ? valueA.localeCompare(valueB) > 0 : valueA.localeCompare(valueB) < 0;
+            // Convertir les chaînes en nombres si possible
+            if (typeof valueA === 'string' && !isNaN(parseFloat(valueA))) {
+                valueA = parseFloat(valueA);
             }
-            else if (typeof valueA === 'number' && typeof valueB === 'number') {
+            if (typeof valueB === 'string' && !isNaN(parseFloat(valueB))) {
+                valueB = parseFloat(valueB);
+            }
+            // Comparaison selon le type des valeurs et l'ordre demandé
+            if (typeof valueA === 'number' && typeof valueB === 'number') {
                 shouldSwap = order === 'asc' ? valueA > valueB : valueA < valueB;
             }
+            else if (typeof valueA === 'string' && typeof valueB === 'string') {
+                shouldSwap = order === 'asc' ? valueA.localeCompare(valueB) > 0 : valueA.localeCompare(valueB) < 0;
+            }
+            // Échange des valeurs si nécessaire
             if (shouldSwap) {
-                // Échanger les éléments
                 [data[j], data[j + 1]] = [data[j + 1], data[j]];
                 swapped = true;
             }
         }
-        // Si aucun échange n'a eu lieu, les données sont déjà triées
         if (!swapped)
-            break;
+            break; // Arrêt si plus d'échange nécessaire
     }
-    // Tri
-    console.log('After sorting:', data);
     return data;
 }
 /**
- * Filters data based on a column and condition.
- * @param data Array of objects to filter.
- * @param columnIndex Index of the column to filter by (0-based).
- * @param condition Filtering condition ('equal', 'less', 'greater', 'isIn').
- * @param filterValue Value or array of values to filter against.
- * @returns Filtered data array.
+ * Filtre les données selon une colonne et une condition donnée.
+ * @param data Tableau d'objets à filtrer.
+ * @param columnIndex Index de la colonne à utiliser pour le filtrage.
+ * @param condition Condition de filtrage ('equal', 'less', 'greater', 'isIn').
+ * @param filterValue Valeur ou tableau de valeurs pour le filtrage.
+ * @returns Tableau filtré.
  */
 function filterData(data, columnIndex, condition, filterValue) {
     return data.filter(row => {
         const columnValue = Object.values(row)[columnIndex];
-        // Assurer que la colonne est bien définie
         if (columnValue === undefined || columnValue === null)
             return false;
-        // Si filterValue est une chaîne de caractères ou un nombre, on traite comme tel
         const numericFilterValue = typeof filterValue === 'string' ? parseFloat(filterValue) : filterValue;
+        // Vérification selon la condition
         switch (condition) {
             case 'equal':
                 return columnValue == filterValue;
             case 'less':
-                // Vérifier que columnValue et filterValue sont des nombres avant de comparer
                 return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue < numericFilterValue;
             case 'greater':
-                // Vérifier que columnValue et filterValue sont des nombres avant de comparer
                 return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue > numericFilterValue;
             case 'isIn':
-                // Vérifier si filterValue est un tableau
                 if (Array.isArray(filterValue)) {
-                    // Vérifier que columnValue est une valeur primitive (ni objet, ni tableau)
-                    if (columnValue !== null && typeof columnValue !== 'object') {
-                        // Assurez-vous que columnValue est bien comparable avec les valeurs dans filterValue
-                        return filterValue.some(value => value === columnValue);
-                    }
-                    // Si columnValue est un objet ou un tableau, on ne le compare pas avec filterValue
-                    return false;
+                    return filterValue.some(value => value === columnValue);
                 }
                 return false;
             default:
                 throw new Error(`Unknown filtering condition: ${condition}`);
         }
     });
+}
+/**
+ * Fonction principale pour traiter les questions courantes (tri, filtrage, etc.) sur le CSV.
+ */
+async function processCSV(filePath) {
+    const data = await readCSV(filePath);
+    // Retourner un maximum de 5 lignes
+    const limitedData = paginate(data, 5)[0];
+    console.log('First 5 lines:', limitedData);
+    // Tri par coût unitaire (descendant)
+    const sortedByUnitCost = sortData([...data], 2, 'desc');
+    console.log('Sorted by unit cost (desc):', sortedByUnitCost);
+    // Tri par type (ascendant)
+    const sortedByType = sortData([...data], 3, 'asc');
+    console.log('Sorted by type (asc):', sortedByType);
+    // Filtrer uniquement les bombes
+    const bombsOnly = filterData(data, 3, 'equal', 'Bomb');
+    console.log('Bombs only:', bombsOnly);
+    // Filtrer pour un rayon > 500 km
+    const rangeMoreThan500 = filterData(data, 4, 'greater', 500);
+    console.log('Range > 500 km:', rangeMoreThan500);
+    // Bonus : Filtrer les armements situés à la base aérienne du nord
+    const northernAirBase = filterData(data, 5, 'equal', 'Northern Air Base');
+    console.log('Armament located in Northern Air Base:', northernAirBase);
 }

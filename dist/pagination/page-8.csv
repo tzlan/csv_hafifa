@@ -1,6 +1,0 @@
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
-Long Range Shot,Missile,45,3000,30,900,YES,"North Bunker, Central Air Base"
-Heat Seeker II,AA missile,18,28000,0,35,YES,"Northern Air Base, Central Air Base, Underground Air Base"
-Cruiser Strike,Missile,250,2500,200,18000,NO,Central Air Base
-Planet Destroyer,Atomic,8000,120,9000,1200,NO,Underground Air Base
-Rhino Tank II,Ground Vehicle,70,120,0,1800,YES,All bases

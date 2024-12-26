@@ -1,6 +1,0 @@
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
-Metoultil,Missile,25,6000,15,500,YES,"North Bunker, South Camp"
-Tsitsit Zahav,AA missile,10,50000,0,20,YES,"Northern Air Base, South Camp, Central Air Base"
-Tiltilon,Missile,150,5000,120,15000,NO,Central Air Base
-AtoBoum,"Atomic ",5000,200,5000,1000,NO,Underground Air Base
-Zion wheels,Ground Vehicle,40,200,0,1000,YES,All bases

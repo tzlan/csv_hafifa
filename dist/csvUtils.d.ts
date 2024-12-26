@@ -1,36 +1,40 @@
 /**
- * Reads a CSV file and returns its content as an array of objects.
- * @param filePath Path to the CSV file.
- * @returns Parsed CSV data as an array of objects.
+ * Fonction pour lire un fichier CSV et le convertir en tableau d'objets.
+ * @param filePath Chemin du fichier CSV.
+ * @returns Données du CSV parsées sous forme de tableau d'objets.
  */
 export declare function readCSV(filePath: string): Promise<any[]>;
 /**
- * Paginates data into smaller chunks of a specified size.
- * @param data Array of objects to paginate.
- * @param pageSize Number of items per page.
- * @returns Array of pages (each page is an array of objects).
+ * Fonction pour paginer un tableau en morceaux plus petits.
+ * @param data Tableau d'objets à paginer.
+ * @param pageSize Nombre d'éléments par page.
+ * @returns Un tableau contenant des pages (chacune étant un tableau d'objets).
  */
 export declare function paginate(data: any[], pageSize: number): any[][];
 /**
- * Writes paginated data to separate CSV files.
- * @param pages Array of pages (each page is an array of objects).
- * @param outputDir Directory to save the files.
+ * fonction pour sauvegarder chaque page dans un fichier CSV séparé
+ * @param pages tableau de pages (chacune étant un tableau d'objets)
+ * @param outputDir dossier ou je sauvegarde mes fichiers
  */
 export declare function savePagesAsCSV(pages: any[][], outputDir: string): void;
 /**
- * Sorts the data by a specific column and order (ascending or descending) using Bubble Sort.
- * @param data Array of objects to sort.
- * @param columnIndex Index of the column to sort by (0-based).
- * @param order Sorting order ('asc' for ascending, 'desc' for descending).
- * @returns Sorted array of objects.
+ * Fonction de tri des données par colonne et ordre (ascendant ou descendant).
+ * @param data Tableau d'objets à trier.
+ * @param columnIndex Index de la colonne à trier.
+ * @param order Ordre du tri ('asc' ou 'desc').
+ * @returns Tableau trié.
  */
 export declare function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'): any[];
 /**
- * Filters data based on a column and condition.
- * @param data Array of objects to filter.
- * @param columnIndex Index of the column to filter by (0-based).
- * @param condition Filtering condition ('equal', 'less', 'greater', 'isIn').
- * @param filterValue Value or array of values to filter against.
- * @returns Filtered data array.
+ * Filtre les données selon une colonne et une condition donnée.
+ * @param data Tableau d'objets à filtrer.
+ * @param columnIndex Index de la colonne à utiliser pour le filtrage.
+ * @param condition Condition de filtrage ('equal', 'less', 'greater', 'isIn').
+ * @param filterValue Valeur ou tableau de valeurs pour le filtrage.
+ * @returns Tableau filtré.
  */
 export declare function filterData(data: any[], columnIndex: number, condition: 'equal' | 'less' | 'greater' | 'isIn', filterValue: string | number | (string | number)[]): any[];
+/**
+ * Fonction principale pour traiter les questions courantes (tri, filtrage, etc.) sur le CSV.
+ */
+export declare function processCSV(filePath: string): Promise<void>;

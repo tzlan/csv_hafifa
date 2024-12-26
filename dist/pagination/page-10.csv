@@ -1,6 +1,0 @@
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
-Stealth Fighter,Aircraft,220000,8,0,18000,YES,Central Air Base
-Apache II,Helicopter,120000,25,0,800,YES,"Central Air Base, Northern Air Base"
-Fighter Jet II,Aircraft,450000,3,0,35000,NO,Underground Air Base
-Transport Helicopter II,Helicopter,250000,8,0,1500,YES,Underground Air Base
-Observation Post,Zeppelin,150000,1,0,0,NO,North Bunker

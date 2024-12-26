@@ -1,6 +1,0 @@
-Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
-Vortex II,Helicopter,210000,20,0,1500,YES,Underground Air Base
-Air Titan,Zeppelin,110000,1,0,0,NO,North Bunker
-Nuclear Fire,Bomb,9.5,400,35,7,YES,South Camp
-Silent Strike,Bomb,200,3,800,1100,NO,Underground Air Base
-Quick Fire,Bomb,0.07,75000,0.7,0.7,YES,"Central Air Base, South Camp"

@@ -2,12 +2,30 @@ import fs from 'fs';
 import Papa from 'papaparse';
 
 
-//ts-node index.ts --action "read-csv" --file "data.csv" --limit 5
-//ts-node index.ts --action "sort" --file "data.csv" --column "unit_cost" --order "asc" # ou "desc"
-//ts-node index.ts --action "sort" --file "data.csv" --column "type" --order "asc"
-//ts-node index.ts --action "filter" --file "data.csv" --column "type" --condition "equal" --value "bomb"
-//ts-node index.ts --action "filter" --file "data.csv" --column "range" --condition "greater" --value 500
+/**Juste lire le fichier CSV et le convertir en tableau d'objets
+ts-node src/index.ts --action "read-csv" --file "./data/data.csv"
 
+Utiliser paginate
+ts-node index.ts --action "paginate" --file "./data/data.csv" --pageSize 3
+
+Tri
+ts-node index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
+
+Filtrer
+ts-node index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
+
+Tri filtrage et pagination 
+ts-node index.ts --action "full-process" --file "./data/data.csv" --pageSize 3 --sortColumn 2 --sortOrder "asc" --filterColumn 3 --filterCondition "equal" --filterValue "Rifle"
+
+
+ts-node src/index.ts --pageSize 2 --sortColumn 4 --sortOrder desc --filter "Drone" --filterCondition equal
+ts-node src/index.ts --action "read-csv" --file "data.csv" --limit 5
+ts-node src/index.ts --action "sort" --file "data.csv" --column "unit_cost" --order "asc" # ou "desc"
+ts-node src/index.ts --action "sort" --file "data.csv" --column "type" --order "asc"
+ts-node src/index.ts --action "filter" --file "data.csv" --column "type" --condition "equal" --value "bomb"
+ts-node src/index.ts --action "filter" --file "data.csv" --column "range" --condition "greater" --value 500
+
+*/
 
 /**
  * Fonction pour lire un fichier CSV et le convertir en tableau d'objets.
@@ -41,11 +59,18 @@ export function paginate(data: any[], pageSize: number): any[][] {
 
     // calcule du nombre total de pages
     const numberOfPages = Math.ceil(data.length / pageSize);
-    //j'arrondit le résultat de la division vers le haut pour inclure une 
-    //page supplémentaire si des lignes restent 
+
+    /**  je divise le nombre total d'éléments par le nombre d'éléments par page
+    * le résultat de la division vers le haut pour inclure une 
+    * page supplémentaire si des lignes restent 
+    * 
+    * si le tableau contient 11 éléments et que la taille de la page est 5 genre 11/5 = 3
+    */
+
     const pages: any[][] = [];
+    //je crée les pages 
     for (let i = 0; i < numberOfPages; i++) {
-        const start = i * pageSize;
+        const start = i * pageSize; 
         const end = Math.min(start + pageSize, data.length);
         // Ajouter une tranche de données à la page
         pages.push(data.slice(start, end));
@@ -54,9 +79,9 @@ export function paginate(data: any[], pageSize: number): any[][] {
 }
 
 /**
- * Fonction pour sauvegarder chaque page dans un fichier CSV séparé.
- * @param pages Tableau de pages (chacune étant un tableau d'objets).
- * @param outputDir Dossier où sauvegarder les fichiers.
+ * fonction pour sauvegarder chaque page dans un fichier CSV séparé
+ * @param pages tableau de pages (chacune étant un tableau d'objets)
+ * @param outputDir dossier ou je sauvegarde mes fichiers
  */
 export function savePagesAsCSV(pages: any[][], outputDir: string): void {
     if (!fs.existsSync(outputDir)) {
@@ -66,22 +91,24 @@ export function savePagesAsCSV(pages: any[][], outputDir: string): void {
     pages.forEach((page, index) => {
         // Convertir une page en contenu CSV
         const csvContent = Papa.unparse(page);
-        const fileName = `${outputDir}/page-${index + 1}.csv`; // Nom du fichier
-        fs.writeFileSync(fileName, csvContent); // Écrire le contenu dans le fichier
+        const fileName = `${outputDir}/page-${index + 1}.csv`; // juste le blaze du fichier
+        fs.writeFileSync(fileName, csvContent); //  le contenu du fichier
         console.log(`Page ${index + 1} saved to ${fileName}`);
     });
 }
 
 /**
- * Fonction de tri des données par colonne et ordre (ascendant ou descendant).
- * @param data Tableau d'objets à trier.
- * @param columnIndex Index de la colonne à trier.
- * @param order Ordre du tri ('asc' ou 'desc').
- * @returns Tableau trié.
+ * Fonction de tri des données par colonne et ordre (ascendant ou descendant)
+ * @param data tableau que je rentre en param a trier 
+ * @param columnIndex Index de la colonne à trier
+ * @param order Ordre du tri ('asc' ou 'desc')
+ * @returns Tableau trié
+ 
  */
 export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'): any[] {
     const n = data.length;
 
+    //Basic Tri a bulles
     for (let i = 0; i < n - 1; i++) {
         let swapped = false;
 
@@ -89,8 +116,9 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
             let valueA = data[j][columnIndex];
             let valueB = data[j + 1][columnIndex];
             let shouldSwap = false;
-
-            // Convertir les chaînes en nombres si possible
+            
+            
+            // Convertir les chaînes en nombres au cas
             if (typeof valueA === 'string' && !isNaN(parseFloat(valueA))) {
                 valueA = parseFloat(valueA);
             }
@@ -126,38 +154,48 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
  * @param filterValue Valeur ou tableau de valeurs pour le filtrage.
  * @returns Tableau filtré.
  */
+
 export function filterData(
-    data: any[],
-    columnIndex: number,
-    condition: 'equal' | 'less' | 'greater' | 'isIn',
-    filterValue: string | number | (string | number)[]
+    data: any[], // Tableau d'objets à filtrer
+    columnIndex: number, // Index de la colonne à utiliser pour le filtrage
+    condition: 'equal' | 'less' | 'greater' | 'isIn', // Condition de filtrage
+    filterValue: string | number | (string | number)[] // Valeur ou tableau de valeurs pour le filtrage
 ): any[] {
+    // Utilise la méthode filter pour créer un nouveau tableau avec les éléments qui passent le test
     return data.filter(row => {
+        // Récupère la valeur de la colonne spécifiée dans la ligne actuelle
         const columnValue = Object.values(row)[columnIndex];
 
+        // Si la valeur de la colonne est indéfinie ou nulle, exclut la ligne
         if (columnValue === undefined || columnValue === null) return false;
 
+        // Convertit filterValue en nombre si c'est une chaîne de caractères
         const numericFilterValue = typeof filterValue === 'string' ? parseFloat(filterValue) : filterValue;
 
         // Vérification selon la condition
         switch (condition) {
             case 'equal':
+                // Vérifie si la valeur de la colonne est égale à filterValue
                 return columnValue == filterValue;
             case 'less':
+                // Vérifie si la valeur de la colonne est inférieure à filterValue (pour les nombres)
                 return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue < numericFilterValue;
             case 'greater':
+                // Vérifie si la valeur de la colonne est supérieure à filterValue (pour les nombres)
                 return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue > numericFilterValue;
             case 'isIn':
+                // Vérifie si la valeur de la colonne est dans le tableau filterValue
                 if (Array.isArray(filterValue)) {
                     return filterValue.some(value => value === columnValue);
                 }
                 return false;
             default:
+                // Lance une erreur si la condition est inconnue
                 throw new Error(`Unknown filtering condition: ${condition}`);
         }
     });
 }
-
+                     
 /**
  * Fonction principale pour traiter les questions courantes (tri, filtrage, etc.) sur le CSV.
  */
