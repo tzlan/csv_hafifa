@@ -154,47 +154,68 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
  * @param filterValue Valeur ou tableau de valeurs pour le filtrage.
  * @returns Tableau filtré.
  */
-
 export function filterData(
     data: any[], // Tableau d'objets à filtrer
     columnIndex: number, // Index de la colonne à utiliser pour le filtrage
     condition: 'equal' | 'less' | 'greater' | 'isIn', // Condition de filtrage
     filterValue: string | number | (string | number)[] // Valeur ou tableau de valeurs pour le filtrage
 ): any[] {
-    // Utilise la méthode filter pour créer un nouveau tableau avec les éléments qui passent le test
-    return data.filter(row => {
+    // Tableau pour stocker les résultats filtrés
+    const filteredData: any[] = [];
+
+    // Parcourt chaque ligne des données
+    for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+
         // Récupère la valeur de la colonne spécifiée dans la ligne actuelle
         const columnValue = Object.values(row)[columnIndex];
 
-        // Si la valeur de la colonne est indéfinie ou nulle, exclut la ligne
-        if (columnValue === undefined || columnValue === null) return false;
+        // Si la valeur de la colonne est indéfinie ou nulle, passe à la prochaine itération
+        if (columnValue === undefined || columnValue === null) continue;
 
         // Convertit filterValue en nombre si c'est une chaîne de caractères
         const numericFilterValue = typeof filterValue === 'string' ? parseFloat(filterValue) : filterValue;
 
         // Vérification selon la condition
+        let match = false;
         switch (condition) {
             case 'equal':
                 // Vérifie si la valeur de la colonne est égale à filterValue
-                return columnValue == filterValue;
+                match = columnValue == filterValue;
+                break;
             case 'less':
                 // Vérifie si la valeur de la colonne est inférieure à filterValue (pour les nombres)
-                return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue < numericFilterValue;
+                match = typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue < numericFilterValue;
+                break;
             case 'greater':
                 // Vérifie si la valeur de la colonne est supérieure à filterValue (pour les nombres)
-                return typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue > numericFilterValue;
+                match = typeof columnValue === 'number' && typeof numericFilterValue === 'number' && columnValue > numericFilterValue;
+                break;
             case 'isIn':
                 // Vérifie si la valeur de la colonne est dans le tableau filterValue
                 if (Array.isArray(filterValue)) {
-                    return filterValue.some(value => value === columnValue);
+                    for (let j = 0; j < filterValue.length; j++) {
+                        if (filterValue[j] === columnValue) {
+                            match = true;
+                            break;
+                        }
+                    }
                 }
-                return false;
+                break;
             default:
                 // Lance une erreur si la condition est inconnue
                 throw new Error(`Unknown filtering condition: ${condition}`);
         }
-    });
+
+        // Si la condition est satisfaite, ajoute la ligne au tableau des résultats
+        if (match) {
+            filteredData.push(row);
+        }
+    }
+
+    return filteredData;
 }
+
                      
 /**
  * Fonction principale pour traiter les questions courantes (tri, filtrage, etc.) sur le CSV.
