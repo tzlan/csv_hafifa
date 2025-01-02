@@ -6,16 +6,16 @@ import Papa from 'papaparse';
 ts-node src/index.ts --action "read-csv" --file "./data/data.csv"
 
 Utiliser paginate
-ts-node index.ts --action "paginate" --file "./data/data.csv" --pageSize 3
+ts-node src/index.ts --action "paginate" --file "./data/data.csv" --pageSize 3
 
 Tri
-ts-node index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
+ts-node src/index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
 
 Filtrer
-ts-node index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
+ts-node src/index.ts --action "sort" --file "./data/data.csv" --column 2 --order "asc"
 
 Tri filtrage et pagination 
-ts-node index.ts --action "full-process" --file "./data/data.csv" --pageSize 3 --sortColumn 2 --sortOrder "asc" --filterColumn 3 --filterCondition "equal" --filterValue "Rifle"
+ts-node src/index.ts --action "full-process" --file "./data/data.csv" --pageSize 3 --sortColumn 2 --sortOrder "asc" --filterColumn 3 --filterCondition "equal" --filterValue "Rifle"
 
 
 ts-node src/index.ts --pageSize 2 --sortColumn 4 --sortOrder desc --filter "Drone" --filterCondition equal
@@ -27,12 +27,20 @@ ts-node src/index.ts --action "filter" --file "data.csv" --column "range" --cond
 
 */
 
+// Define types to replace 'any'
+interface DataRow {
+    [key: string]: string | number;
+}
+
+type FilterCondition = 'equal' | 'less' | 'greater' | 'isIn';
+type SortOrder = 'asc' | 'desc';
+
 /**
  * Fonction pour lire un fichier CSV et le convertir en tableau d'objets
  * @param filePath Chemin du fichier CSV
  * @returns Données du CSV parsées sous forme de tableau d'objets
  */
-export async function readCSV(filePath: string): Promise<any[]> {
+const readCSV = (filePath: string): Promise<DataRow[]> => {
     return new Promise((resolve, reject) => {
         // Lecture du fichier CSV en tant que texte
         const fileContent = fs.readFileSync(filePath, 'utf8'); 
@@ -40,11 +48,11 @@ export async function readCSV(filePath: string): Promise<any[]> {
         Papa.parse(fileContent, {
             header: true, // Considérer la première ligne comme en-tête
             skipEmptyLines: true, // Ignorer les lignes vides
-            complete: (result) => resolve(result.data), // Résultat en cas de succès
+            complete: (result) => resolve(result.data as DataRow[]), // Résultat en cas de succès
             error: (error: Error) => reject(error), // Gestion des erreurs
         });
     });
-}
+};
 
 /**
  * Fonction pour paginer un tableau en morceaux plus petits.
@@ -52,7 +60,7 @@ export async function readCSV(filePath: string): Promise<any[]> {
  * @param pageSize Nombre d'éléments par page.
  * @returns Un tableau contenant des pages (chacune étant un tableau d'objets).
  */
-export function paginate(data: any[], pageSize: number): any[][] {
+const paginate = (data: DataRow[], pageSize: number): DataRow[][] => {
     if (!Number.isInteger(pageSize) || pageSize < 2 || pageSize > 50) {
         throw new Error('Page size must be an integer between 2 and 50.');
     } 
@@ -67,35 +75,32 @@ export function paginate(data: any[], pageSize: number): any[][] {
     * si le tableau contient 11 éléments et que la taille de la page est 5 genre 11/5 = 3
     */
 
-    const pages: any[][] = [];
-    //je crée les pages 
-    for (let i = 0; i < numberOfPages; i++) {
+    // Using map instead of for loop to create pages
+    return [...Array(numberOfPages)].map((_, i) => {
         const start = i * pageSize; 
         const end = Math.min(start + pageSize, data.length);
-        // Ajouter une tranche de données à la page
-        pages.push(data.slice(start, end));
-    }
-    return pages;
-}
+        return data.slice(start, end);
+    });
+};
 
 /**
  * fonction pour sauvegarder chaque page dans un fichier CSV séparé
  * @param pages tableau de pages (chacune étant un tableau d'objets)
  * @param outputDir dossier ou je sauvegarde mes fichiers
  */
-export function savePagesAsCSV(pages: any[][], outputDir: string): void {
+const savePagesAsCSV = (pages: DataRow[][], outputDir: string): void => {
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir); // Créer le dossier s'il n'existe pas
     }
 
-    pages.forEach((page, index) => {
+    pages.map((page, index) => {
         // Convertir une page en contenu CSV
         const csvContent = Papa.unparse(page);
         const fileName = `${outputDir}/page-${index + 1}.csv`; // juste le blaze du fichier
         fs.writeFileSync(fileName, csvContent); //  le contenu du fichier
         console.log(`Page ${index + 1} saved to ${fileName}`);
     });
-}
+};
 
 /**
  * Fonction de tri des données par colonne et ordre (ascendant ou descendant)
@@ -103,9 +108,8 @@ export function savePagesAsCSV(pages: any[][], outputDir: string): void {
  * @param columnIndex Index de la colonne à trier
  * @param order Ordre du tri ('asc' ou 'desc')
  * @returns Tableau trié
- 
  */
-export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'): any[] {
+const sortData = (data: DataRow[], columnIndex: number, order: SortOrder): DataRow[] => {
     const n = data.length;
 
     //Basic Tri a bulles
@@ -113,10 +117,9 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
         let swapped = false;
 
         for (let j = 0; j < n - 1 - i; j++) {
-            let valueA = data[j][columnIndex];
-            let valueB = data[j + 1][columnIndex];
+            let valueA = Object.values(data[j])[columnIndex];
+            let valueB = Object.values(data[j + 1])[columnIndex];
             let shouldSwap = false;
-            
             
             // Convertir les chaînes en nombres au cas
             if (typeof valueA === 'string' && !isNaN(parseFloat(valueA))) {
@@ -144,7 +147,7 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
     }
 
     return data;
-}
+};
 
 /**
  * Filtre les données selon une colonne et une condition donnée.
@@ -154,14 +157,14 @@ export function sortData(data: any[], columnIndex: number, order: 'asc' | 'desc'
  * @param filterValue Valeur ou tableau de valeurs pour le filtrage.
  * @returns Tableau filtré.
  */
-export function filterData(
-    data: any[], // Tableau d'objets à filtrer
+const filterData = (
+    data: DataRow[], // Tableau d'objets à filtrer
     columnIndex: number, // Index de la colonne à utiliser pour le filtrage
-    condition: 'equal' | 'less' | 'greater' | 'isIn', // Condition de filtrage
+    condition: FilterCondition, // Condition de filtrage
     filterValue: string | number | (string | number)[] // Valeur ou tableau de valeurs pour le filtrage
-): any[] {
+): DataRow[] => {
     // Tableau pour stocker les résultats filtrés
-    const filteredData: any[] = [];
+    const filteredData: DataRow[] = [];
 
     // Parcourt chaque ligne des données
     for (let i = 0; i < data.length; i++) {
@@ -214,36 +217,48 @@ export function filterData(
     }
 
     return filteredData;
-}
+};
 
-                     
 /**
  * Fonction principale pour traiter les questions courantes (tri, filtrage, etc.) sur le CSV.
  */
-export async function processCSV(filePath: string) {
-    const data = await readCSV(filePath);
+const processCSV = (filePath: string): Promise<void> => {
+    return new Promise(async (resolve) => {
+        const data = await readCSV(filePath);
 
-    // Retourner un maximum de 5 lignes
-    const limitedData = paginate(data, 5)[0];
-    console.log('First 5 lines:', limitedData);
+        // Retourner un maximum de 5 lignes
+        const limitedData = paginate(data, 5)[0];
+        console.log('First 5 lines:', limitedData);
 
-    // Tri par coût unitaire (descendant)
-    const sortedByUnitCost = sortData([...data], 2, 'desc');
-    console.log('Sorted by unit cost (desc):', sortedByUnitCost);
+        // Tri par coût unitaire (descendant)
+        const sortedByUnitCost = sortData([...data], 2, 'desc');
+        console.log('Sorted by unit cost (desc):', sortedByUnitCost);
 
-    // Tri par type (ascendant)
-    const sortedByType = sortData([...data], 3, 'asc');
-    console.log('Sorted by type (asc):', sortedByType);
+        // Tri par type (ascendant)
+        const sortedByType = sortData([...data], 3, 'asc');
+        console.log('Sorted by type (asc):', sortedByType);
 
-    // Filtrer uniquement les bombes
-    const bombsOnly = filterData(data, 3, 'equal', 'Bomb');
-    console.log('Bombs only:', bombsOnly);
+        // Filtrer uniquement les bombes
+        const bombsOnly = filterData(data, 3, 'equal', 'Bomb');
+        console.log('Bombs only:', bombsOnly);
 
-    // Filtrer pour un rayon > 500 km
-    const rangeMoreThan500 = filterData(data, 4, 'greater', 500);
-    console.log('Range > 500 km:', rangeMoreThan500);
+        // Filtrer pour un rayon > 500 km
+        const rangeMoreThan500 = filterData(data, 4, 'greater', 500);
+        console.log('Range > 500 km:', rangeMoreThan500);
 
-    // Bonus : Filtrer les armements situés à la base aérienne du nord
-    const northernAirBase = filterData(data, 5, 'equal', 'Northern Air Base');
-    console.log('Armament located in Northern Air Base:', northernAirBase);
-}
+        // Bonus : Filtrer les armements situés à la base aérienne du nord
+        const northernAirBase = filterData(data, 5, 'equal', 'Northern Air Base');
+        console.log('Armament located in Northern Air Base:', northernAirBase);
+        
+        resolve();
+    });
+};
+
+export {
+    readCSV,
+    paginate,
+    savePagesAsCSV,
+    sortData,
+    filterData,
+    processCSV
+};

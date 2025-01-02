@@ -1,5 +1,5 @@
 Name,Type,Unit Cost (k $),Quantity,Power (kJ),Range (KM),Official,Location
+Laser Rifle,Rifle,3.2,1500,2,0.6,YES,All bases
+Laser Shield,Protection,2.5,4000,0,0,YES,All bases
 Mini-Suicide-Squad,Drone,0.4,300,5,150,NO,North Bunker
-Big-Boy-Bomb,Bomb,8.5,600,150,5,YES,North Bunker
 Zbavil,Aircraft,80000,22,0,10000,YES,Central Air Base
-Big-Bee,Helicopter,45000,65,0,500,YES,"Central Air Base, Nothern Air Base"
