@@ -65,7 +65,7 @@ const paginate = (data: DataRow[], pageSize: number): DataRow[][] => {
         throw new Error('Page size must be an integer between 2 and 50.');
     } 
 
-    // calcule du nombre total de pages
+    // calcule du nombre total de pages (arrondir a l'entier supérieur)
     const numberOfPages = Math.ceil(data.length / pageSize);
 
     /**  je divise le nombre total d'éléments par le nombre d'éléments par page
@@ -75,10 +75,12 @@ const paginate = (data: DataRow[], pageSize: number): DataRow[][] => {
     * si le tableau contient 11 éléments et que la taille de la page est 5 genre 11/5 = 3
     */
 
-    // Using map instead of for loop to create pages
+  
+    //divise le tableau data en plusieurs pages de 
+    //taille fixe (pageSize) et retourne un tableau de pages
     return [...Array(numberOfPages)].map((_, i) => {
-        const start = i * pageSize; 
-        const end = Math.min(start + pageSize, data.length);
+        const start = i * pageSize; //calcul index de debut de page 
+        const end = Math.min(start + pageSize, data.length); //je verifie qu'il fait bien la taille max en fct de la taille du tab
         return data.slice(start, end);
     });
 };
